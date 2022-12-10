@@ -85,3 +85,45 @@ ggplot(plot_data)+
 ## saving the plot
 ggsave("ERC.png", width = 16/1.6, height = 9/1.6, units = "in", dpi = 320)
 
+
+## version with size of the flag as # of grants
+grants <- df %>% 
+  filter(date == "2014-20") %>% 
+  mutate(host = if_else(host == "UK", "GB", host),
+         host = if_else(host == "IL", "IE", host)) %>% 
+  group_by(host) %>% 
+  summarise(N = sum(N))
+
+plot_data %>% 
+  left_join(grants, by = c("nation" = "host")) %>% 
+  ggplot()+
+  aes(x = `ERC_incoming_2014-20`, y = `ERC_abroad_2014-20`, country = country, image = country)+
+  geom_abline(slope = 1, intercept = 0, color = "#bebada", linetype = "dashed")+
+  geom_flag(aes(size = N))+
+  geom_mark_hull(aes(group = group, description = label), 
+                 expand = unit(6, "mm"),
+                 label.fill = NULL, label.fontsize = c(10,9), label.buffer = unit(2, "mm"),
+                 con.colour = "grey60", con.cap = unit(1.3, "mm"))+
+  coord_cartesian(xlim = c(0,0.7), ylim = c(-0.05,0.7))+
+  ## scales, labels and theme
+  scale_x_continuous(labels = scales::percent)+
+  scale_y_continuous(labels = scales::percent)+
+  scale_size(range = c(1,14))+
+  labs(y= "<span style = 'font-size:18pt'>**Outflow**</span><br><span style = 'font-size:9pt'> % of national ERC grantees abroad</span>",
+       x = "<span style = 'font-size:18pt'>**Inflow**</span><br><span style = 'font-size:9pt'> % of foreign ERC grantees in nation</span>",
+       caption = "analysis @paolocrosetto",
+       title = "<span style = 'font-size:24pt'>Does your country _attract_ or _lose_ top-class researchers?</span>",
+       subtitle = "ERC grantees **inflow** and **outflow**, _2014-20_. Flag size indicates # of ERC grants received.")+
+  theme_ipsum_rc()+
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(),
+        plot.title.position = "plot",
+        axis.title.x = element_markdown(),
+        axis.title.y = element_markdown(),
+        plot.title = element_markdown(),
+        plot.subtitle = element_markdown(hjust = 1),
+        plot.background = element_rect(colour = "white", fill = "white")
+  ) 
+
+ggsave("ERC_size.png", width = 16/1.6, height = 9/1.6, units = "in", dpi = 320)
+  
