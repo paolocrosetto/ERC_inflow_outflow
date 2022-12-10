@@ -17,3 +17,9 @@ The plot has been share on Twitter here: <https://twitter.com/PaoloCrosetto/stat
 ## Plot
 
 ![](ERC.png)
+
+## Size-adjusted plot
+
+Here flags are adjusted to indicate number of projects run in the country.
+
+![](ERC_size.png)
