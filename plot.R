@@ -51,7 +51,8 @@ plot_data <- data %>%
                            group == "IL" ~ "Rather closed",
                            group == "IT" ~ "Large outflow, very little inflow"))
 
-# plot
+
+#### plot 1: scatter of inflow and outflow, with flags ####
 ggplot(plot_data)+
   ## main plot: flags + annotation
   aes(x = `ERC_incoming_2014-20`, y = `ERC_abroad_2014-20`, country = country, image = country)+
@@ -82,10 +83,10 @@ ggplot(plot_data)+
         ) 
 
 ## saving the plot
-ggsave("ERC.png", width = 16/1.6, height = 9/1.6, units = "in", dpi = 320)
+ggsave("Plots/ERC.png", width = 16/1.6, height = 9/1.6, units = "in", dpi = 320)
 
 
-## version with size of the flag as # of grants
+#### plot 2: scatter of inflow and outflow, with flags scaled by number of ERC hosted projects ####
 grants <- df %>% 
   filter(date == "2014-20") %>% 
   mutate(host = if_else(host == "UK", "GB", host)) %>% 
@@ -123,5 +124,80 @@ plot_data %>%
         plot.background = element_rect(colour = "white", fill = "white")
   ) 
 
-ggsave("ERC_size.png", width = 16/1.6, height = 9/1.6, units = "in", dpi = 320)
-  
+ggsave("Plots/ERC_size.png", width = 16/1.6, height = 9/1.6, units = "in", dpi = 320)
+
+
+#### plot 3: dumbbell of evolution of inflow and outflow over the two time periods ####
+
+
+inflow_plot <- plot_data %>%
+  mutate(sign = `ERC_incoming_2014-20` - `ERC_incoming_2007-13` > 0) %>% 
+  ggplot() +
+  aes(y = reorder(nation, `ERC_incoming_2014-20`), x = `ERC_incoming_2007-13`) +
+  #geom_point()+
+  #geom_point(aes(x = `ERC_incoming_2014-20`))+
+  geom_segment(aes(y = reorder(nation, `ERC_incoming_2014-20`), yend = reorder(nation, `ERC_incoming_2014-20`),
+                   x = `ERC_incoming_2007-13`, xend = `ERC_incoming_2014-20`, color = sign), 
+               arrow = arrow(angle = 30, length = unit(0.10, "inches"),
+                             ends = "last", type = "closed"), 
+               lineend = "round",
+               size = 2)+
+  geom_flag(aes(x = -0.1, country = country), size = 10)+
+  scale_x_continuous(labels = scales::percent)+
+  scale_color_manual(name = "", values = c("#E73F12", "#018241"))+
+  labs(x = "<span style = 'font-size:18pt'>**changes in inflow**</span><br><span style = 'font-size:9pt'> % of foreign ERC grantees in nation</span>",
+       y = "",
+       title = "<span style = 'font-size:24pt'> Inflow </span>")+
+  hrbrthemes::theme_ipsum_rc()+
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(),
+        plot.title.position = "plot",
+        axis.title.x = element_markdown(),
+        axis.text.y = element_blank(),
+        plot.title = element_markdown(),
+        plot.subtitle = element_markdown(hjust = 1),
+        plot.background = element_rect(colour = "white", fill = "white"))
+
+
+
+outflow_plot <- plot_data %>%
+  mutate(sign = `ERC_abroad_2014-20` - `ERC_abroad_2007-13` < 0) %>% 
+  ggplot() +
+  aes(y = reorder(nation, `ERC_abroad_2014-20`), x = `ERC_abroad_2007-13`) +
+  #geom_point()+
+  #geom_point(aes(x = `ERC_abroad_2014-20`))+
+  geom_segment(aes(y = reorder(nation, `ERC_abroad_2014-20`), yend = reorder(nation, `ERC_abroad_2014-20`),
+                   x = `ERC_abroad_2007-13`, xend = `ERC_abroad_2014-20`, color = sign), 
+               arrow = arrow(angle = 30, length = unit(0.10, "inches"),
+                             ends = "last", type = "closed"), 
+               lineend = "round",
+               size = 2)+
+  geom_flag(aes(x = -0.1, country = country), size = 10)+
+  scale_x_continuous(labels = scales::percent)+
+  scale_color_manual(name = "", values = c("#E73F12", "#018241"))+
+  labs(x = "<span style = 'font-size:18pt'>**changes in outflow**</span><br><span style = 'font-size:9pt'> % of national ERC grantees abroad</span>",
+       y = "",
+       caption = "no data for Sweden in 2014-20",
+       title = "<span style = 'font-size:24pt'>Outflow</span>")+
+  hrbrthemes::theme_ipsum_rc()+
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(),
+        plot.title.position = "plot",
+        axis.title.x = element_markdown(),
+        axis.text.y = element_blank(),
+        plot.title = element_markdown(),
+        plot.subtitle = element_markdown(hjust = 1),
+        plot.background = element_rect(colour = "white", fill = "white"))
+
+library(patchwork)
+inflow_plot+outflow_plot + 
+  plot_annotation(title = "<span style = 'font-size:24pt'>How did ERC grantees inflow and outflow change over time?</span>", 
+                  subtitle = "Change in _inflow_ & _outflow_, _2007-13_ to _2014-20_, 12 largest ERC host countries", 
+                  caption = "analysis @paolocrosetto",
+                  theme = theme(plot.title = element_markdown(face = "bold", family = "Roboto Condensed"),
+                                plot.subtitle = element_markdown(family = "Roboto condensed", 
+                                                                 hjust = 1, size = 14, face = "plain")))
+ggsave("Plots/inflow_outflow.png", width = 16/1.1, height = 9/1.1, units = "in", dpi = 320)
+
+
+
