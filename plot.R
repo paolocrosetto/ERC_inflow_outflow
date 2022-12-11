@@ -38,18 +38,17 @@ data <- inflow %>%
 plot_data <- data %>% 
   select(-ERC_staying, - ERC_home) %>% 
   pivot_wider(names_from = "date", values_from = c(ERC_incoming, ERC_abroad)) %>% 
-  mutate(nation = if_else(nation == "UK", "GB", nation),
-         nation = if_else(nation == "IL", "IE", nation)) %>% 
+  mutate(nation = if_else(nation == "UK", "GB", nation)) %>% 
   mutate(country = str_to_lower(nation)) %>% 
   mutate(group = case_when(nation %in% c("AT", "CH") ~ "ATCH",
                            nation %in% c("IT") ~ "IT",
-                           nation %in% c("IE") ~ "IE",
+                           nation %in% c("IL") ~ "IL",
                            nation %in% c("NL", "SE", "GB", "DK") ~ "nordic",
                            TRUE ~ "core")) %>% 
   mutate(label = case_when(group == "ATCH" ~ "Small countries\nwith large inflows",
                            group == "core" ~ "The core of Europe\n~25% in, ~25% out",
                            group == "nordic" ~ "More inflow than outflow",
-                           group == "IE" ~ "Rather closed",
+                           group == "IL" ~ "Rather closed",
                            group == "IT" ~ "Large outflow, very little inflow"))
 
 # plot
@@ -69,8 +68,8 @@ ggplot(plot_data)+
   labs(y= "<span style = 'font-size:18pt'>**Outflow**</span><br><span style = 'font-size:9pt'> % of national ERC grantees abroad</span>",
        x = "<span style = 'font-size:18pt'>**Inflow**</span><br><span style = 'font-size:9pt'> % of foreign ERC grantees in nation</span>",
        caption = "analysis @paolocrosetto",
-       title = "<span style = 'font-size:24pt'>Does your country _attract_ or _lose_ top-class researchers?</span>",
-       subtitle = "ERC grantees **inflow** and **outflow**, _2014-20_")+
+       title = "<span style = 'font-size:24pt'>Does your country _attract_ or _lose_ ERC grantees?</span>",
+       subtitle = "ERC grantees **inflow** and **outflow** for the 12 largest ERC host countries, _2014-20_")+
   theme_ipsum_rc()+
   theme(legend.position = "bottom",
         panel.grid.minor = element_blank(),
@@ -89,8 +88,7 @@ ggsave("ERC.png", width = 16/1.6, height = 9/1.6, units = "in", dpi = 320)
 ## version with size of the flag as # of grants
 grants <- df %>% 
   filter(date == "2014-20") %>% 
-  mutate(host = if_else(host == "UK", "GB", host),
-         host = if_else(host == "IL", "IE", host)) %>% 
+  mutate(host = if_else(host == "UK", "GB", host)) %>% 
   group_by(host) %>% 
   summarise(N = sum(N))
 
@@ -113,7 +111,7 @@ plot_data %>%
        x = "<span style = 'font-size:18pt'>**Inflow**</span><br><span style = 'font-size:9pt'> % of foreign ERC grantees in nation</span>",
        caption = "analysis @paolocrosetto",
        title = "<span style = 'font-size:24pt'>Does your country _attract_ or _lose_ top-class researchers?</span>",
-       subtitle = "ERC grantees **inflow** and **outflow**, _2014-20_. Flag size indicates # of ERC grants received.")+
+       subtitle = "ERC grantees **inflow** and **outflow** for the 12 largest ERC host countries, _2014-20_. Flag size indicates # of ERC grants received.")+
   theme_ipsum_rc()+
   theme(legend.position = "none",
         panel.grid.minor = element_blank(),
