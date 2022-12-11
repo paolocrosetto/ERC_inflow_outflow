@@ -14,8 +14,10 @@ Data were shared by the ERC based on official ERC data, aggregated over several 
 
 ## Correct plots
 
-![](ERC.png)
+Not adjusting flag size by number of ERC hosted projects
+
+![](Plots/ERC.png)
 
 Here flags are adjusted to indicate number of projects run in the country (Belgium disappears behind France).
 
-![](ERC_size.png)
+![](Plots/ERC_size.png)
