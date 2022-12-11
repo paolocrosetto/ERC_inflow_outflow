@@ -25,3 +25,7 @@ Here flags are adjusted to indicate number of projects run in the country (Belgi
 ## Evolution of inflow and outflow
 
 ![](Plots/inflow_outflow.png)
+
+## Alluvial plot of all movements
+
+![](Plots/alluvial.png)

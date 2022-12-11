@@ -199,5 +199,27 @@ inflow_plot+outflow_plot +
                                                                  hjust = 1, size = 14, face = "plain")))
 ggsave("Plots/inflow_outflow.png", width = 16/1.1, height = 9/1.1, units = "in", dpi = 320)
 
+#### plot 4: a bit chaotic but this is a chord diagram ####
+library(ggalluvial)
+
+df %>% 
+  filter(nationality %in% c(host, "Other")) %>%
+  ggplot(aes(y = N, axis1 = nationality, axis2 = host)) +
+  geom_alluvium(aes(fill = host), width = 0.5/12) +
+  geom_stratum(aes(fill = host), width = 1/12, color = "black")+
+  geom_label(stat = "stratum", aes(label = after_stat(stratum)))+
+  scale_x_discrete(expand = c(.05, .05))+
+  #paletteer::scale_fill_paletteer_d(palette = "ggsci::default_igv")+
+  labs(y = "")+
+  theme_ipsum_rc()+
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        axis.text.y = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        plot.background = element_rect(fill = "white", color = "white"))
+ggsave("Plots/alluvial.png", height = 16/1.2, width = 9/1.2, units = "in", dpi = 320)
+
+# lodes form
 
 
