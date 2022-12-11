@@ -21,3 +21,7 @@ Not adjusting flag size by number of ERC hosted projects
 Here flags are adjusted to indicate number of projects run in the country (Belgium disappears behind France).
 
 ![](Plots/ERC_size.png)
+
+## Evolution of inflow and outflow
+
+![](Plots/inflow_outflow.png)
