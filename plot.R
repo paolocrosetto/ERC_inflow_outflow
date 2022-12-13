@@ -227,4 +227,31 @@ df %>%
 ggsave("Plots/alluvial.png", height = 16/1.2, width = 9/1.2, units = "in", dpi = 320)
 
 
-
+## same, but without the self-flow
+df %>% 
+  filter(date == "2014-20") %>% 
+  mutate(nationality = if_else(nationality %in% host, nationality, "Other")) %>% 
+  filter(nationality != host) %>% 
+  mutate(nationality = as.factor(nationality)) %>% 
+  group_by(host, nationality) %>% 
+  summarise(N = sum(N)) %>% 
+  ggplot(aes(y = N, axis1 = nationality, axis2 = host)) +
+  geom_alluvium(aes(fill = host), width = 0.5/12, color = "black", size = .3) +
+  geom_stratum(aes(fill = host), width = 1/12)+
+  geom_label(stat = "stratum", aes(label = after_stat(stratum)))+
+  scale_x_discrete(expand = c(.05, .05))+
+  labs(y = "", 
+       title = "Researchers of nation (left) running an ERC in country (right) -- excluding stayers",
+       subtitle = "ERC data, _2014-20_, top 12 ERC host countries",
+       caption = "analysis @paolocrosetto")+
+  #paletteer::scale_fill_paletteer_d("ggthemes::Classic_Cyclic")+
+  theme_ipsum_rc()+
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        axis.text.y = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        plot.title = element_markdown(),
+        plot.subtitle = element_markdown(hjust = 1),
+        plot.background = element_rect(fill = "white", color = "white"))
+ggsave("Plots/alluvial_movers.png", height = 16/1.2, width = 9/1.2, units = "in", dpi = 320)
