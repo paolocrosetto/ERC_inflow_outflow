@@ -255,3 +255,34 @@ df %>%
         plot.subtitle = element_markdown(hjust = 1),
         plot.background = element_rect(fill = "white", color = "white"))
 ggsave("Plots/alluvial_movers.png", height = 16/1.2, width = 9/1.2, units = "in", dpi = 320)
+
+
+#### Just 4 countries, flows #####
+fivecount <- df %>% 
+  filter(date == "2014-20") %>% 
+  mutate(nationality = if_else(nationality %in% host, nationality, "Other")) %>% 
+  filter(nationality != host) %>% 
+  mutate(nationality = as.factor(nationality)) %>% 
+  group_by(host, nationality) %>% 
+  summarise(N = sum(N)) %>% 
+  filter(host %in% c("IT", "FR", "DE", "UK"), 
+         nationality %in% c("IT", "FR", "DE", "UK"))
+
+
+
+fivecount <- fivecount %>% 
+  pivot_wider(names_from = nationality, values_from = N, values_fill = 0) %>% 
+  ungroup() %>% 
+  select(DE, FR, IT, UK)
+
+m <- fivecount %>% as.matrix()
+
+dimnames(m) <- list(names(fivecount),
+                    names(fivecount))
+
+
+chorddiag::chorddiag(m, type = "bipartite", 
+                     categoryNames = c("Inflow", "Outflow"),
+                     showTicks = F, 
+                     palette = "Set1")
+
